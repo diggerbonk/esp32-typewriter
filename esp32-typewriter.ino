@@ -5,15 +5,25 @@
  * 
 */
 
+#include <PS2KeyAdvanced.h>
+
 // Define GPIO pins to use for printer serial comms.
 #define RXD2 16
 #define TXD2 17
+#define KEYBOARD_DATA 32
+#define KEYBOARD_CLK 14
 
 // track the current horizontal position of the print head. 
 int horizontalPosition = 0;
+int loopCounter = 0;
+
+PS2KeyAdvanced keyboard;
+uint16_t inChar;
 
 void setup() {
-
+  
+  
+  keyboard.begin(KEYBOARD_DATA, KEYBOARD_CLK);
   // Note the format for setting a serial port is as follows: Serial2.begin(baud-rate, protocol, RX pin, TX pin);
   Serial.begin(115200);
   Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
@@ -31,19 +41,19 @@ void setup() {
   Serial2.write(char(247)); // bit positions 5, 6, 7, 8
   Serial2.write(char(0));             // no bit positions
 
-  // fetch the printer
-  sleep(1);
-  Serial.println("Fetching ID");
-  Serial2.write(char(27));  // ESC
-  Serial2.write(char(63));  // Send ID command
-  while (!Serial2.available()) {
-    sleep(1);
-  }
-  while ( Serial2.available() )  {
-    Serial.print(Serial2.read());
-  }
-  Serial.print("\n");
-  sleep(1);
+//  // fetch the printer
+//  sleep(1);
+//  Serial.println("Fetching ID");
+//  Serial2.write(char(27));  // ESC
+//  Serial2.write(char(63));  // Send ID command
+//  while (!Serial2.available()) {
+//    sleep(1);
+//  }
+//  while ( Serial2.available() )  {
+//    Serial.print(Serial2.read());
+//  }
+//  Serial.print("\n");
+//  sleep(1);
   
   Serial.println("Set up unidirectional printing");
   // set the printer to use unidirectional printing
@@ -57,13 +67,22 @@ void setup() {
   sleep(1);
   Serial.println("Serial Txd is on pin: "+String(TX));
   Serial.println("Serial Rxd is on pin: "+String(RX));
+  
+  Serial.println("starting keyboard handler");
 }
 
 void loop() {
   int incomingByte = -1;
   char buff[6];
-  while (Serial.available()) {
-    incomingByte = Serial.read();
+  
+  while (keyboard.available()) {
+    
+    inChar = keyboard.read();
+    if ( inChar > 0 ) {
+      
+        Serial.print(inChar);
+    }
+    /*
     if (incomingByte == -1) break;
     else if (incomingByte == 13 || incomingByte == 10) { // intercept returns and newlines.
       Serial.println("gobbling up carriage return");
@@ -88,5 +107,6 @@ void loop() {
       horizontalPosition = horizontalPosition + 8;
       
     }
+    */
   }
 }
