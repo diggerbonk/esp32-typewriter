@@ -15,7 +15,7 @@
 
 // track the current horizontal position of the print head. 
 int horizontalPosition = 0;
-
+int lineFeedDirection = 1;
 PS2KeyAdvanced keyboard;
 uint16_t inChar;
 
@@ -55,8 +55,8 @@ void setup() {
   
   Serial.println("Set up unidirectional printing");
   // set the printer to use unidirectional printing
-  Serial2.write(byte(27));  // ESC
-  Serial2.write(byte(62));  // Turn on unidirectional printing 
+  // Serial2.write(byte(27));  // ESC
+  // Serial2.write(byte(62));  // Turn on unidirectional printing 
 
   //sleep(1);
   //Serial.println("Sent printer select");
@@ -107,10 +107,35 @@ void loop() {
         Serial.print(' ');
       }
       else if (inChar == 286) {
+        if (lineFeedDirection == 0){
+          Serial2.print(char(27));
+          Serial2.print('f');
+          lineFeedDirection = 1;
+        }
         horizontalPosition = 0;
         Serial2.print(char(13));
         Serial2.print(char(10));
         Serial.print('\n');
+      }
+      else if (inChar == 276){
+        if (lineFeedDirection == 1){
+          Serial2.print(char(27));
+          Serial2.print('r');
+          lineFeedDirection = 0;          
+        }
+        Serial2.print(char(10));
+      }
+      else if (inChar == 275){
+        if (lineFeedDirection == 0){
+          Serial2.print(char(27));
+          Serial2.print('f');
+          lineFeedDirection = 1;
+        }
+        Serial2.print(char(10));
+      }
+      else{
+        Serial.print(inChar);
+        Serial.print(" ");
       }
     }
   }
