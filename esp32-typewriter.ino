@@ -40,6 +40,7 @@ void setup() {
   Serial2.write(char(0));             // no bit positions
 
   // fetch the printer
+  /*
   sleep(1);
   Serial.println("Fetching ID");
   Serial2.write(char(27));  // ESC
@@ -52,7 +53,7 @@ void setup() {
   }
   Serial.print("\n");
   sleep(1);
-  
+  */
   Serial.println("Set up unidirectional printing");
   // set the printer to use unidirectional printing
   // Serial2.write(byte(27));  // ESC
